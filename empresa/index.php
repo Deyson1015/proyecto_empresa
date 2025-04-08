@@ -56,7 +56,6 @@ do {
 
         case 3:
             $usuario->listarUsuarios();
-            break;
             echo "Ingrese el ID del usuario: ";
             $id = trim(fgets(STDIN));
 
@@ -78,12 +77,41 @@ do {
             break;
 
         case 4:
-          
+            $usuario->listarUsuarios();
+            echo "Ingrese el ID del usuario a actualizar: ";
+            $id = trim(fgets(STDIN));
+
+            echo "Nuevo primer nombre: ";
+            $primer_nombre = trim(fgets(STDIN));
+            echo "Nuevo primer apellido: ";
+            $primer_apellido = trim(fgets(STDIN));
+            echo "Nuevo segundo apellido: ";
+            $segundo_apellido = trim(fgets(STDIN));
+            echo "Nuevo teléfono: ";
+            $telefono = trim(fgets(STDIN));
+            echo "Nuevo correo: ";
+            $correo = trim(fgets(STDIN));
+            echo "Nueva fecha de nacimiento (YYYY-MM-DD): ";
+            $fecha_nacimiento = trim(fgets(STDIN));
+            echo "Nueva dirección: ";
+            $direccion = trim(fgets(STDIN));
+
+            $mensaje = $usuario->actualizarUsuario(
+                $id,
+                $primer_nombre,
+                $primer_apellido,
+                $segundo_apellido,
+                $telefono,
+                $correo,
+                $fecha_nacimiento,
+                $direccion
+            );
+            echo $mensaje . "\n";
+            break;
 
         case 5:
             
             $usuario->listarUsuarios();
-            break;
             echo "Ingrese el ID del usuario a eliminar: ";
             $id = trim(fgets(STDIN));
             
