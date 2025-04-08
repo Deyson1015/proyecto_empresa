@@ -28,11 +28,12 @@ class Usuario
                 $resultado = $this->conn->prepare($sql);
                 $resultado->execute();
                 if ($resultado->rowCount() === 0) {
-                    echo "No hay usuarios registrados.\n";
-                    return;
+                    $mensajeError = "No hay usuarios registrados.\n";
+                    return $mensajeError;
+                } else {
+                    $usuarios = $resultado->fetchAll(PDO::FETCH_ASSOC);
+                    return $usuarios;
                 }
-                $usuarios = $resultado->fetchAll(PDO::FETCH_ASSOC);
-
 
                 foreach ($usuarios as $usuario) {
                     $id = $usuario["id"];
@@ -40,7 +41,7 @@ class Usuario
                     $edad = $usuario["edad"];
                     $telefono = $usuario["telefono"];
                 
-                    echo "ID: $id|Nombre: $nombre_completo | Edad: $edad años | Teléfono: $telefono\n";
+                    echo "ID: $id | Nombre: $nombre_completo | Edad: $edad años | Teléfono: $telefono\n";
                 }    
             }catch (PDOException $e) {
                 echo "Error al listar usuarios: " . $e->getMessage() . "\n";
@@ -54,12 +55,12 @@ class Usuario
         $resultado->bindParam(':id', $id, PDO::PARAM_INT); 
 
         $resultado->execute();
-
-        if ($resultado->rowCount() > 0) {
+        if ($resultado->rowCount() === 0) {
+            $mensajeError = "No hay usuarios registrados.\n";
+            return $mensajeError;
+        } else {
             $usuario = $resultado->fetch(PDO::FETCH_ASSOC);
             return $usuario;
-        } else {
-            return null;
         }
     }
 
@@ -73,7 +74,7 @@ class Usuario
         }
 
         $sql = "INSERT INTO usuarios (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, telefono, correo, fecha_nacimiento, direccion)
-        VALUES (:primer_nombre, :segundo_nombre, :primer_apellido, :segundo_apellido,:telefono, :correo, :fecha_nacimiento, :direccion)";
+        VALUES (:primer_nombre, :segundo_nombre, :primer_apellido, :segundo_apellido, :telefono, :correo, :fecha_nacimiento, :direccion)";
 
         $resultado = $this->conn->prepare($sql);
         $resultado->bindParam(':primer_nombre', $datos['primer_nombre']);
@@ -120,10 +121,11 @@ class Usuario
         $resultado->bindParam(':id', $id, PDO::PARAM_INT);
     
         if ($resultado->execute()) {
-            if ($resultado->rowCount() > 0) {
-                return "Usuario actualizado correctamente.";
+            if ($resultado->rowCount() === 0) {
+                $mensajeError = "No hay usuarios registrados.\n";
+                return $mensajeError;
             } else {
-                return "No se encontró el usuario.";
+                return "Usuario actualizado correctamente.";
             }
         } else {
             return "Error al actualizar el usuario.";
@@ -136,8 +138,16 @@ class Usuario
     $resultado = $this->conn->prepare($sql);
     $resultado->bindParam(':id', $id, PDO::PARAM_INT);
 
-    return $resultado->execute();
-
-    }
+        if ($resultado->execute()) {
+            if ($resultado->rowCount() === 0) {
+                $mensajeError = "No hay usuarios registrados.\n";
+                return $mensajeError;
+            } else {
+                return "Usuario Eliminado correctamente..";
+            }    
+        } else {
+            return "Error: al eliminar el usuario";
+        }
+    }   
 }
 

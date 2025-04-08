@@ -80,34 +80,39 @@ do {
             $usuario->listarUsuarios();
             echo "Ingrese el ID del usuario a actualizar: ";
             $id = trim(fgets(STDIN));
+            if (!ctype_digit($id)) {
+                echo "El ID debe ser un número entero positivo.\n";
+            } else {
+                $id = (int)$id; 
 
-            echo "Nuevo primer nombre: ";
-            $primer_nombre = trim(fgets(STDIN));
-            echo "Nuevo primer apellido: ";
-            $primer_apellido = trim(fgets(STDIN));
-            echo "Nuevo segundo apellido: ";
-            $segundo_apellido = trim(fgets(STDIN));
-            echo "Nuevo teléfono: ";
-            $telefono = trim(fgets(STDIN));
-            echo "Nuevo correo: ";
-            $correo = trim(fgets(STDIN));
-            echo "Nueva fecha de nacimiento (YYYY-MM-DD): ";
-            $fecha_nacimiento = trim(fgets(STDIN));
-            echo "Nueva dirección: ";
-            $direccion = trim(fgets(STDIN));
+                echo "Nuevo primer nombre: ";
+                $primer_nombre = trim(fgets(STDIN));
+                echo "Nuevo primer apellido: ";
+                $primer_apellido = trim(fgets(STDIN));
+                echo "Nuevo segundo apellido: ";
+                $segundo_apellido = trim(fgets(STDIN));
+                echo "Nuevo teléfono: ";
+                $telefono = trim(fgets(STDIN));
+                echo "Nuevo correo: ";
+                $correo = trim(fgets(STDIN));
+                echo "Nueva fecha de nacimiento (YYYY-MM-DD): ";
+                $fecha_nacimiento = trim(fgets(STDIN));
+                echo "Nueva dirección: ";
+                $direccion = trim(fgets(STDIN));
 
-            $mensaje = $usuario->actualizarUsuario(
-                $id,
-                $primer_nombre,
-                $primer_apellido,
-                $segundo_apellido,
-                $telefono,
-                $correo,
-                $fecha_nacimiento,
-                $direccion
-            );
-            echo $mensaje . "\n";
-            break;
+                $mensaje = $usuario->actualizarUsuario(
+                    $id,
+                    $primer_nombre,
+                    $primer_apellido,
+                    $segundo_apellido,
+                    $telefono,
+                    $correo,
+                    $fecha_nacimiento,
+                    $direccion
+                );
+                echo $mensaje . "\n";
+            }
+                break;
 
         case 5:
             
