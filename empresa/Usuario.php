@@ -14,6 +14,7 @@ class Usuario
     public function listarUsuarios()
     {
         $sql = "SELECT 
+        u.id,
         u.primer_nombre,
         u.segundo_nombre,
         u.primer_apellido,
@@ -22,18 +23,28 @@ class Usuario
         TRUNCATE(DATEDIFF(CURRENT_DATE, STR_TO_DATE(u.fecha_nacimiento, '%Y-%m-%d')) / 365.25, 0) AS edad
         FROM usuarios AS u";
 
-        $resultado = $this->conn->prepare($sql);
-        $resultado->execute();
-        $usuarios = $resultado->fetchAll(PDO::FETCH_ASSOC);
+        try {
 
-        foreach ($usuarios as $usuario) {
-            $nombre_completo = $usuario["primer_nombre"] ." ". $usuario["segundo_nombre"] ." ". $usuario["primer_apellido"] ." ". $usuario["segundo_apellido"];
-            $edad = $usuario["edad"];
-            $telefono = $usuario["telefono"];
-        
-            echo "Nombre: $nombre_completo | Edad: $edad años | Teléfono: $telefono\n";
+                $resultado = $this->conn->prepare($sql);
+                $resultado->execute();
+                if ($resultado->rowCount() === 0) {
+                    echo "No hay usuarios registrados.\n";
+                    return;
+                }
+                $usuarios = $resultado->fetchAll(PDO::FETCH_ASSOC);
 
-        }
+
+                foreach ($usuarios as $usuario) {
+                    $id = $usuario["id"];
+                    $nombre_completo = $usuario["primer_nombre"] ." ". $usuario["segundo_nombre"] ." ". $usuario["primer_apellido"] ." ". $usuario["segundo_apellido"];
+                    $edad = $usuario["edad"];
+                    $telefono = $usuario["telefono"];
+                
+                    echo "ID: $id|Nombre: $nombre_completo | Edad: $edad años | Teléfono: $telefono\n";
+                }    
+            }catch (PDOException $e) {
+                echo "Error al listar usuarios: " . $e->getMessage() . "\n";
+            }
     }
 
     public function obtenerUsuario($id)
@@ -54,6 +65,13 @@ class Usuario
 
     public function crearUsuario($datos)
     {
+        foreach (['primer_nombre', 'primer_apellido', 'telefono', 'correo', 'fecha_nacimiento', 'direccion'] as $campo) {
+            if (empty($datos[$campo])) {
+                echo "El campo '$campo' es obligatorio.\n";
+                return false;
+            }
+        }
+
         $sql = "INSERT INTO usuarios (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, telefono, correo, fecha_nacimiento, direccion)
         VALUES (:primer_nombre, :segundo_nombre, :primer_apellido, :segundo_apellido,:telefono, :correo, :fecha_nacimiento, :direccion)";
 
@@ -105,7 +123,7 @@ class Usuario
             if ($resultado->rowCount() > 0) {
                 return "Usuario actualizado correctamente.";
             } else {
-                return "No se encontró el usuario o los datos no cambiaron.";
+                return "No se encontró el usuario.";
             }
         } else {
             return "Error al actualizar el usuario.";
@@ -114,9 +132,7 @@ class Usuario
 
     public function eliminarUsuario($id)
     {
-        
     $sql = "DELETE FROM usuarios WHERE id = :id";
-
     $resultado = $this->conn->prepare($sql);
     $resultado->bindParam(':id', $id, PDO::PARAM_INT);
 
@@ -124,3 +140,4 @@ class Usuario
 
     }
 }
+
