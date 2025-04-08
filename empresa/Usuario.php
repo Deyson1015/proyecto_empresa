@@ -54,15 +54,14 @@ class Usuario
 
     public function crearUsuario($datos)
     {
-        $sql = "INSERT INTO usuarios (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, documento, telefono, correo, fecha_nacimiento, direccion)
-        VALUES (:primer_nombre, :segundo_nombre, :primer_apellido, :segundo_apellido, :documento, :telefono, :correo, :fecha_nacimiento, :direccion)";
+        $sql = "INSERT INTO usuarios (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, telefono, correo, fecha_nacimiento, direccion)
+        VALUES (:primer_nombre, :segundo_nombre, :primer_apellido, :segundo_apellido,:telefono, :correo, :fecha_nacimiento, :direccion)";
 
         $resultado = $this->conn->prepare($sql);
         $resultado->bindParam(':primer_nombre', $datos['primer_nombre']);
         $resultado->bindParam(':segundo_nombre', $datos['segundo_nombre']);
         $resultado->bindParam(':primer_apellido', $datos['primer_apellido']);
         $resultado->bindParam(':segundo_apellido', $datos['segundo_apellido']);
-        $resultado->bindParam(':documento', $datos['documento']);
         $resultado->bindParam(':telefono', $datos['telefono']);
         $resultado->bindParam(':correo', $datos['correo']);
         $resultado->bindParam(':fecha_nacimiento', $datos['fecha_nacimiento']);
@@ -86,7 +85,6 @@ class Usuario
                     primer_nombre = :primer_nombre,
                     primer_apellido = :primer_apellido,
                     segundo_apellido = :segundo_apellido,
-                    documento = :documento,
                     telefono = :telefono,
                     correo = :correo,
                     fecha_nacimiento = :fecha_nacimiento,
@@ -98,7 +96,6 @@ class Usuario
         $resultado->bindParam(':primer_nombre', $primer_nombre);
         $resultado->bindParam(':primer_apellido', $primer_apellido);
         $resultado->bindParam(':segundo_apellido', $segundo_apellido);
-        $resultado->bindParam(':documento', $documento);
         $resultado->bindParam(':telefono', $telefono);
         $resultado->bindParam(':correo', $correo);
         $resultado->bindParam(':fecha_nacimiento', $fecha_nacimiento);
