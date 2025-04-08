@@ -38,20 +38,30 @@ class Usuario
 
     public function obtenerUsuario($id)
     {
-        // Lógica para obtener un usuario por ID
+        $sql = "SELECT * FROM usuarios WHERE id = :id";
+        $resultado = $this->conn->prepare($sql);
+        $resultado->bindParam(':id', $id, PDO::PARAM_INT); 
+
+        $resultado->execute();
+
+        if ($resultado->rowCount() > 0) {
+            $usuario = $resultado->fetch(PDO::FETCH_ASSOC);
+            return $usuario;
+        } else {
+            return null;
+        }
     }
 
     public function crearUsuario($datos)
     {
-        $sql = "INSERT INTO usuarios (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, documento, telefono, correo, fecha_nacimiento, direccion)
-        VALUES (:primer_nombre, :segundo_nombre, :primer_apellido, :segundo_apellido, :documento, :telefono, :correo, :fecha_nacimiento, :direccion)";
+        $sql = "INSERT INTO usuarios (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, telefono, correo, fecha_nacimiento, direccion)
+        VALUES (:primer_nombre, :segundo_nombre, :primer_apellido, :segundo_apellido,:telefono, :correo, :fecha_nacimiento, :direccion)";
 
         $resultado = $this->conn->prepare($sql);
         $resultado->bindParam(':primer_nombre', $datos['primer_nombre']);
         $resultado->bindParam(':segundo_nombre', $datos['segundo_nombre']);
         $resultado->bindParam(':primer_apellido', $datos['primer_apellido']);
         $resultado->bindParam(':segundo_apellido', $datos['segundo_apellido']);
-        $resultado->bindParam(':documento', $datos['documento']);
         $resultado->bindParam(':telefono', $datos['telefono']);
         $resultado->bindParam(':correo', $datos['correo']);
         $resultado->bindParam(':fecha_nacimiento', $datos['fecha_nacimiento']);
@@ -60,9 +70,46 @@ class Usuario
         return $resultado->execute();
     }
 
-    public function actualizarUsuario()
-    {
-        // Lógica para actualizar un usuario
+    public function actualizarUsuario(
+        $id,
+        $primer_nombre,
+        $primer_apellido,
+        $segundo_apellido,
+        $telefono,
+        $correo,
+        $fecha_nacimiento,
+        $direccion
+    ) {
+        $sql = "UPDATE usuarios SET 
+                    primer_nombre = :primer_nombre,
+                    primer_apellido = :primer_apellido,
+                    segundo_apellido = :segundo_apellido,
+                    telefono = :telefono,
+                    correo = :correo,
+                    fecha_nacimiento = :fecha_nacimiento,
+                    direccion = :direccion
+                WHERE id = :id";
+    
+        $resultado = $this->conn->prepare($sql);
+    
+        $resultado->bindParam(':primer_nombre', $primer_nombre);
+        $resultado->bindParam(':primer_apellido', $primer_apellido);
+        $resultado->bindParam(':segundo_apellido', $segundo_apellido);
+        $resultado->bindParam(':telefono', $telefono);
+        $resultado->bindParam(':correo', $correo);
+        $resultado->bindParam(':fecha_nacimiento', $fecha_nacimiento);
+        $resultado->bindParam(':direccion', $direccion);
+        $resultado->bindParam(':id', $id, PDO::PARAM_INT);
+    
+        if ($resultado->execute()) {
+            if ($resultado->rowCount() > 0) {
+                return "Usuario actualizado correctamente.";
+            } else {
+                return "No se encontró el usuario o los datos no cambiaron.";
+            }
+        } else {
+            return "Error al actualizar el usuario.";
+        }
     }
 
     public function eliminarUsuario($id)

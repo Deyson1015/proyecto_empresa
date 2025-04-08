@@ -33,7 +33,6 @@ CREATE TABLE `usuarios` (
   `segundo_nombre` varchar(50) DEFAULT NULL,
   `primer_apellido` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `segundo_apellido` varchar(50) DEFAULT NULL,
-  `documento` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `telefono` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `correo` varchar(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `fecha_nacimiento` date NOT NULL,
