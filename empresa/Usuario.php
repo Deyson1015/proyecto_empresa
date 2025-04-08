@@ -75,7 +75,6 @@ class Usuario
         $primer_nombre,
         $primer_apellido,
         $segundo_apellido,
-        $documento,
         $telefono,
         $correo,
         $fecha_nacimiento,
