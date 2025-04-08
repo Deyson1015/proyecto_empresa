@@ -71,9 +71,49 @@ class Usuario
         return $resultado->execute();
     }
 
-    public function actualizarUsuario()
-    {
-        // Lógica para actualizar un usuario
+    public function actualizarUsuario(
+        $id,
+        $primer_nombre,
+        $primer_apellido,
+        $segundo_apellido,
+        $documento,
+        $telefono,
+        $correo,
+        $fecha_nacimiento,
+        $direccion
+    ) {
+        $sql = "UPDATE usuarios SET 
+                    primer_nombre = :primer_nombre,
+                    primer_apellido = :primer_apellido,
+                    segundo_apellido = :segundo_apellido,
+                    documento = :documento,
+                    telefono = :telefono,
+                    correo = :correo,
+                    fecha_nacimiento = :fecha_nacimiento,
+                    direccion = :direccion
+                WHERE id = :id";
+    
+        $resultado = $this->conn->prepare($sql);
+    
+        $resultado->bindParam(':primer_nombre', $primer_nombre);
+        $resultado->bindParam(':primer_apellido', $primer_apellido);
+        $resultado->bindParam(':segundo_apellido', $segundo_apellido);
+        $resultado->bindParam(':documento', $documento);
+        $resultado->bindParam(':telefono', $telefono);
+        $resultado->bindParam(':correo', $correo);
+        $resultado->bindParam(':fecha_nacimiento', $fecha_nacimiento);
+        $resultado->bindParam(':direccion', $direccion);
+        $resultado->bindParam(':id', $id, PDO::PARAM_INT);
+    
+        if ($resultado->execute()) {
+            if ($resultado->rowCount() > 0) {
+                return "Usuario actualizado correctamente.";
+            } else {
+                return "No se encontró el usuario o los datos no cambiaron.";
+            }
+        } else {
+            return "Error al actualizar el usuario.";
+        }
     }
 
     public function eliminarUsuario($id)
