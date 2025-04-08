@@ -78,6 +78,13 @@ class Usuario
 
     public function eliminarUsuario($id)
     {
-        // Lógica para eliminar un usuario
+        
+    $sql = "DELETE FROM usuarios WHERE id = :id";
+
+    $resultado = $this->conn->prepare($sql);
+    $resultado->bindParam(':id', $id, PDO::PARAM_INT);
+
+    return $resultado->execute();
+
     }
 }
