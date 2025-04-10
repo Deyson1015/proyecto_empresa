@@ -1,7 +1,4 @@
 <?php
-// Aquí puedes probar:
-// $usuario->crearUsuario("Ana", "ana@mail.com", 22);
-// print_r($usuario->listarUsuarios());
 
 require_once 'Usuario.php';
 
@@ -51,11 +48,20 @@ do {
 
         case 2:
             echo "--- Lista de Usuarios ---\n";
-            $usuario->listarUsuarios();
+            $usuarios = $usuario->listarUsuarios();
+            
+            if (empty($usuarios)) {
+                echo "No hay usuarios registrados.\n";
+            }
             break;
 
         case 3:
             $usuario->listarUsuarios();
+            if (empty($usuarios)) {
+                echo "No hay usuarios para actualizar.\n";
+                break;
+            }
+
             echo "Ingrese el ID del usuario: ";
             $id = trim(fgets(STDIN));
 
@@ -78,16 +84,23 @@ do {
 
         case 4:
             $usuario->listarUsuarios();
+            if (empty($usuarios)) {
+                echo "No hay usuarios Registrados.\n";
+                break;
+            }
             echo "Ingrese el ID del usuario a actualizar: ";
             $id = trim(fgets(STDIN));
+            
             if (!ctype_digit($id)) {
                 echo "El ID debe ser un número entero positivo.\n";
             } else {
                 $id = (int)$id; 
-
-                echo "Nuevo primer nombre: ";
+            
+                echo "Nuevo Primer nombre: ";
                 $primer_nombre = trim(fgets(STDIN));
-                echo "Nuevo primer apellido: ";
+                echo "Nuevo Segundo nombre: ";
+                $segundo_nombre = trim(fgets(STDIN));
+                echo "Nuevo Primer apellido: ";
                 $primer_apellido = trim(fgets(STDIN));
                 echo "Nuevo segundo apellido: ";
                 $segundo_apellido = trim(fgets(STDIN));
@@ -99,10 +112,11 @@ do {
                 $fecha_nacimiento = trim(fgets(STDIN));
                 echo "Nueva dirección: ";
                 $direccion = trim(fgets(STDIN));
-
+            
                 $mensaje = $usuario->actualizarUsuario(
                     $id,
                     $primer_nombre,
+                    $segundo_nombre,
                     $primer_apellido,
                     $segundo_apellido,
                     $telefono,
@@ -112,11 +126,15 @@ do {
                 );
                 echo $mensaje . "\n";
             }
-                break;
-
+            break;
+            
         case 5:
             
             $usuario->listarUsuarios();
+            if (empty($usuarios)) {
+                echo "No hay usuarios para eliminar. \n";
+                break;
+            }
             echo "Ingrese el ID del usuario a eliminar: ";
             $id = trim(fgets(STDIN));
             
