@@ -45,6 +45,23 @@ class Usuario
             }
         }
 
+        //Valida que el número de telefono tenga maximo 10 catacteres numericos
+        if (!preg_match('/^\d{10}$/', $datos['telefono'])) {
+            echo "El teléfono debe contener exactamente 10 números.\n";
+            return false;
+        }
+
+        // Validar que el correo no esté repetido en la base de datos
+        $sql = "SELECT id FROM usuarios WHERE correo = :correo";
+        $resultado = $this->conn->prepare($sql);
+        $resultado->bindParam(':correo', $datos['correo']);
+        $resultado->execute();
+
+        if ($resultado->rowCount() > 0) {
+            echo "El correo ya está registrado, por favor ingrese otro.\n";
+            return false;
+        }
+
         $sql = "INSERT INTO usuarios 
             (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, telefono, correo, fecha_nacimiento, direccion)
             VALUES 
