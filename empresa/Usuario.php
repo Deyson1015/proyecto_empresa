@@ -1,5 +1,4 @@
 <?php
-
 require_once 'database.php';
 
 class Usuario
@@ -11,116 +10,94 @@ class Usuario
         $this->conn = (new Database())->getConnection();
     }
 
-    public function listarUsuarios()
+    public function listarUsuarios(): array
     {
         $sql = "SELECT 
-        u.primer_nombre,
-        u.segundo_nombre,
-        u.primer_apellido,
-        u.segundo_apellido,
-        u.telefono,
-        TRUNCATE(DATEDIFF(CURRENT_DATE, STR_TO_DATE(u.fecha_nacimiento, '%Y-%m-%d')) / 365.25, 0) AS edad
-        FROM usuarios AS u";
+            u.id,
+            u.primer_nombre,
+            u.segundo_nombre,
+            u.primer_apellido,
+            u.segundo_apellido,
+            u.telefono,
+            TRUNCATE(DATEDIFF(CURRENT_DATE, STR_TO_DATE(u.fecha_nacimiento, '%Y-%m-%d')) / 365.25, 0) AS edad
+            FROM usuarios AS u";
 
         $resultado = $this->conn->prepare($sql);
         $resultado->execute();
-        $usuarios = $resultado->fetchAll(PDO::FETCH_ASSOC);
-
-        foreach ($usuarios as $usuario) {
-            $nombre_completo = $usuario["primer_nombre"] ." ". $usuario["segundo_nombre"] ." ". $usuario["primer_apellido"] ." ". $usuario["segundo_apellido"];
-            $edad = $usuario["edad"];
-            $telefono = $usuario["telefono"];
-        
-            echo "Nombre: $nombre_completo | Edad: $edad años | Teléfono: $telefono\n";
-
-        }
+        return $resultado->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function obtenerUsuario($id)
     {
         $sql = "SELECT * FROM usuarios WHERE id = :id";
         $resultado = $this->conn->prepare($sql);
-        $resultado->bindParam(':id', $id, PDO::PARAM_INT); 
+        $resultado->bindParam(':id', $id, PDO::PARAM_INT);
+        $resultado->execute();
+        return $resultado->fetch(PDO::FETCH_ASSOC);
+    }
 
+    public function crearUsuario($datos): bool
+    {
+        foreach (['primer_nombre', 'primer_apellido', 'telefono', 'correo', 'fecha_nacimiento', 'direccion'] as $campo) {
+            if (empty($datos[$campo])) {
+                echo "El campo '$campo' es obligatorio.\n";
+                return false;
+            }
+        }
+
+        //Valida que el número de telefono tenga maximo 10 catacteres numericos
+        if (!preg_match('/^\d{10}$/', $datos['telefono'])) {
+            echo "El teléfono debe contener exactamente 10 números.\n";
+            return false;
+        }
+
+        // Validar que el correo no esté repetido en la base de datos
+        $sql = "SELECT id FROM usuarios WHERE correo = :correo";
+        $resultado = $this->conn->prepare($sql);
+        $resultado->bindParam(':correo', $datos['correo']);
         $resultado->execute();
 
         if ($resultado->rowCount() > 0) {
-            $usuario = $resultado->fetch(PDO::FETCH_ASSOC);
-            return $usuario;
-        } else {
-            return null;
+            echo "El correo ya está registrado, por favor ingrese otro.\n";
+            return false;
         }
-    }
 
-    public function crearUsuario($datos)
-    {
-        $sql = "INSERT INTO usuarios (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, telefono, correo, fecha_nacimiento, direccion)
-        VALUES (:primer_nombre, :segundo_nombre, :primer_apellido, :segundo_apellido,:telefono, :correo, :fecha_nacimiento, :direccion)";
-
-        $resultado = $this->conn->prepare($sql);
-        $resultado->bindParam(':primer_nombre', $datos['primer_nombre']);
-        $resultado->bindParam(':segundo_nombre', $datos['segundo_nombre']);
-        $resultado->bindParam(':primer_apellido', $datos['primer_apellido']);
-        $resultado->bindParam(':segundo_apellido', $datos['segundo_apellido']);
-        $resultado->bindParam(':telefono', $datos['telefono']);
-        $resultado->bindParam(':correo', $datos['correo']);
-        $resultado->bindParam(':fecha_nacimiento', $datos['fecha_nacimiento']);
-        $resultado->bindParam(':direccion', $datos['direccion']);
-
-        return $resultado->execute();
-    }
-
-    public function actualizarUsuario(
-        $id,
-        $primer_nombre,
-        $primer_apellido,
-        $segundo_apellido,
-        $telefono,
-        $correo,
-        $fecha_nacimiento,
-        $direccion
-    ) {
-        $sql = "UPDATE usuarios SET 
-                    primer_nombre = :primer_nombre,
-                    primer_apellido = :primer_apellido,
-                    segundo_apellido = :segundo_apellido,
-                    telefono = :telefono,
-                    correo = :correo,
-                    fecha_nacimiento = :fecha_nacimiento,
-                    direccion = :direccion
-                WHERE id = :id";
-    
-        $resultado = $this->conn->prepare($sql);
-    
-        $resultado->bindParam(':primer_nombre', $primer_nombre);
-        $resultado->bindParam(':primer_apellido', $primer_apellido);
-        $resultado->bindParam(':segundo_apellido', $segundo_apellido);
-        $resultado->bindParam(':telefono', $telefono);
-        $resultado->bindParam(':correo', $correo);
-        $resultado->bindParam(':fecha_nacimiento', $fecha_nacimiento);
-        $resultado->bindParam(':direccion', $direccion);
-        $resultado->bindParam(':id', $id, PDO::PARAM_INT);
-    
-        if ($resultado->execute()) {
-            if ($resultado->rowCount() > 0) {
-                return "Usuario actualizado correctamente.";
-            } else {
-                return "No se encontró el usuario o los datos no cambiaron.";
-            }
-        } else {
-            return "Error al actualizar el usuario.";
-        }
-    }
-
-    public function eliminarUsuario($id)
-    {
+        $sql = "INSERT INTO usuarios 
+            (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, telefono, correo, fecha_nacimiento, direccion)
+            VALUES 
+            (:primer_nombre, :segundo_nombre, :primer_apellido, :segundo_apellido, :telefono, :correo, :fecha_nacimiento, :direccion)";
         
-    $sql = "DELETE FROM usuarios WHERE id = :id";
+        $resultado = $this->conn->prepare($sql);
+        return $resultado->execute($datos);
+    }
 
-    $resultado = $this->conn->prepare($sql);
-    $resultado->bindParam(':id', $id, PDO::PARAM_INT);
+    public function actualizarUsuario($id, $datos): string
+    {
+        $sql = "UPDATE usuarios SET 
+            primer_nombre = :primer_nombre,
+            segundo_nombre = :segundo_nombre,
+            primer_apellido = :primer_apellido,
+            segundo_apellido = :segundo_apellido,
+            telefono = :telefono,
+            correo = :correo,
+            fecha_nacimiento = :fecha_nacimiento,
+            direccion = :direccion
+            WHERE id = :id";
+        
+        $resultado = $this->conn->prepare($sql);
+        $datos['id'] = $id;
 
-    return $resultado->execute();
+        $resultado->execute($datos);
+        return $resultado->rowCount() > 0 ? "Usuario actualizado correctamente." : "No se encontró el usuario para actualizar.";
+    }
 
+    public function eliminarUsuario($id): string
+    {
+        $sql = "DELETE FROM usuarios WHERE id = :id";
+        $resultado = $this->conn->prepare($sql);
+        $resultado->bindParam(':id', $id, PDO::PARAM_INT);
+        $resultado->execute();
+
+        return $resultado->rowCount() > 0 ? "Usuario eliminado correctamente." : "El usuario con ID $id no existe.";
     }
 }
